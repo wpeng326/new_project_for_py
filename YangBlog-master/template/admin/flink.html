@@ -1,0 +1,162 @@
+{% extends './main.html'%}
+{% block CSS%}
+<style>
+    #changeTagModalLabel {
+        font-weight: bold;
+    }
+    .change-tag-msg {
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
+{% end %}
+
+{% block Body %}
+<br>
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-2">
+                <button type="button" class="button button-primary button-pill button-small" data-toggle="modal" data-target="#changeFlinkModal" action="post" onclick="changeFlinkModal(this);"><i class="fa fa-plus"></i></button>
+            </div>
+        </div>
+    </div>
+    <br>
+  <div class="row">
+      <table class="table table-bordered">
+        <colgroup>
+          <col width="50">
+          <col width="100">
+          <col width="100">
+          <col width="50">
+          <col width="100">
+        </colgroup>
+        <thead>
+          <tr class="info">
+            <th class="text-center">ID</th>
+            <th class="text-center">名称</th>
+            <th class="text-center">url</th>
+            <th class="text-center">排名权重</th>
+            <th class="text-center">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in flink_list %}
+            <tr class="text-center">
+                <td class="id">{{ f['id'] }}</td>
+                <td class="name">{{ f['name'] }}</td>
+                <td class="link">{{ f['link'] }}</td>
+                <td class="weight">{{ f['weight']  }}</td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#changeFlinkModal" action="patch" onclick="changeFlinkModal(this);">编辑</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#changeFlinkModal" action="delete" onclick="changeFlinkModal(this);">删除</button>
+                    </div>
+                </td>
+            </tr>
+          {% end %}
+        </tbody>
+      </table>
+  </div>
+  </div>
+</div>
+
+<!-- changeFlinkModal -->
+<div class="modal fade" id="changeFlinkModal" tabindex="-1" role="dialog" aria-labelledby="changeFlinkModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeModal();">&times;</span></button>
+        <h4 class="modal-title" id="changeFlinkModalLabel">新增友链:</h4>
+      </div>
+        <br>
+        <div class="change-flink-msg col-md-12"></div>
+        <br>
+      <div class="modal-body row">
+          <div class="col-md-12">
+              <div class="input-group">
+                  <span class="input-group-addon" id="name-addon">网站名称:</span>
+                  <input type="text" id="name" class="form-control" placeholder="网站名称" aria-describedby="name-addon">
+              </div>
+              <br>
+              <div class="input-group">
+                  <span class="input-group-addon" id="link-addon">网站URL:</span>
+                  <input type="text" id="link" class="form-control" placeholder="网站URL" aria-describedby="link-addon">
+              </div>
+              <br>
+              <div class="input-group">
+                  <span class="input-group-addon" id="weight-addon">网站权重:</span>
+                  <input type="text" id="weight" class="form-control" placeholder="网站权重" aria-describedby="weight-addon">
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button-primary button-rounded button-small" data-dismiss="modal" onclick="closeModal();">关闭</button>
+        <button type="button" class="button button-primary button-rounded button-small" id="action" action="" flink-id="" onclick="changeFlink();">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- changeFlinkModal End -->
+{% end %}
+
+{% block JS %}
+
+<script>
+    $(function () {
+        $('#flink').addClass('active');
+    });
+
+    function closeModal() {
+        $('.modal-body').find('input').each(function () {
+            $(this).val('');
+        });
+        $('#action').attr('action','')
+    }
+
+    function changeFlinkModal(ths) {
+        if($(ths).attr('action') === 'patch'){
+            $('#action').attr('action','patch').text('确认修改').attr('class','button button-highlight button-rounded button-small');
+            $('#changeFlinkModalLabel').text('确认修改：').css('color','#f0ad4e');
+        }else if($(ths).attr('action') === 'delete'){
+            $('#action').attr('action','delete').text('确认删除').attr('class','button button-action button-rounded button-small');
+            $('#changeFlinkModalLabel').text('真的要删除文章此友链吗？').css('color','#1E9FFF');
+        }else if($(ths).attr('action') === 'post'){
+            $('#action').attr('action','post').text('添加').attr('class','button button-action button-rounded button-small');
+            $('#action').attr('flink-id','post');
+            $('#changeFlinkModalLabel').text('增加友链：').css('color','#1E9FFF');
+            return
+        }
+        $('#action').attr('flink-id',$(ths).parent().parent().parent().find('.id').text());
+        $('#name').val($(ths).parent().parent().parent().find('.name').text());
+        $('#link').val($(ths).parent().parent().parent().find('.link').text());
+        $('#weight').val($(ths).parent().parent().parent().find('.weight').text());
+    }
+
+  function changeFlink() {
+        var flink_data = {};
+        flink_data['flink_id'] = $('#action').attr('flink-id');
+        flink_data['name'] = $('#name').val();
+        flink_data['link'] = $('#link').val();
+        flink_data['weight'] = $('#weight').val();
+        flink_data['action'] = $('#action').attr('action');
+        console.log(flink_data);
+        $.ajax({
+            type:'POST',
+            url: '/admin/flink',
+            data: flink_data,
+            dataType: 'json',
+            success: function(arg){
+                console.log(arg);
+                if(arg.status !== 'false'){
+                    $('.change-flink-msg').text(arg.message).css("color",'#4cae4c');
+                    window.location.reload();
+                }else{
+                    $('.change-flink-msg').text(arg.message).css("color",'#d9534f');
+                }
+            }
+        });
+  }
+</script>
+{% end %}

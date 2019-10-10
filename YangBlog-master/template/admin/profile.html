@@ -1,0 +1,65 @@
+{% extends './main.html'%}
+{% block CSS%}
+<style>
+</style>
+{% end %}
+
+{% block Body %}
+<br>
+<div class="row">
+    <div class="col-md-6">
+        <form class="user-info">
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" class="form-control" id="username" value="{{user_info['username']}}" disabled>
+          </div>
+          <div class="form-group">
+            <label for="old-password">旧密码</label>
+            <input type="password" class="form-control" id="old-password" placeholder="密码">
+          </div>
+          <div class="form-group">
+            <label for="new-password">新密码</label>
+            <input type="password" class="form-control" id="new-password" placeholder="密码">
+          </div>
+          <div class="form-group">
+            <label for="email">邮箱</label>
+            <input type="email" class="form-control" id="email" value="{{user_info['email']}}" placeholder="邮箱">
+          </div>
+          <hr>
+          <button type="button" class="button button-primary button-rounded" onclick="changeProfile();" >更新</button>
+          <span class="change-profile-msg"></span>
+        </form>
+    </div>
+</div>
+{% end %}
+
+{% block JS %}
+<script>
+    $(function () {
+        $('#profile').addClass('active');
+    });
+
+    function changeProfile() {
+          var user_data = {};
+          $('.user-info').find('input').each(function () {
+              user_data[$(this).attr('id')] = $(this).val();
+          });
+          console.log(user_data);
+          $.ajax({
+              type:'POST',
+              url: '/admin/profile',
+              data: user_data,
+              dataType: 'json',
+              success: function(arg){
+                  console.log(arg);
+                  if(arg.status !== 'false'){
+                      $('.change-profile-msg').text(arg.message).css("color",'#4cae4c');
+                      window.location.reload();
+                  }else{
+                      $('.change-profile-msg').text(arg.message).css("color",'#d9534f');
+                  }
+              }
+          });
+    }
+</script>
+{% end %}

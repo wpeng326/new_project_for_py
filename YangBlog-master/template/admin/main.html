@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title data="{{get_title_data('title')}}">{{get_title_data('title')}}</title>
+	<link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/buttons.css">
+    <!--<link rel="stylesheet" href="{{ static_url('css/bootstrap.min.css')}}">-->
+	<style>
+		body {
+			background-color: #f1f1f1;
+		}
+		.body {
+			margin-top: 50px;
+			padding-bottom: 70px;
+		}
+		.left-menu {
+			height: 100%;
+		}
+		.left-menu > .time {
+			font-size: 16px;
+			font-weight: 400;
+			line-height: 26px;
+			color: #1E9FFF;
+			background-image: linear-gradient(to left,#f1f1f1 0,#fff 5%,#f1f1f1 90%);
+		}
+		.left-menu > div {
+			margin: 5px;
+		}
+		#logout {
+			background-color: #f0ad4e;
+		}
+		.content a {
+			color: #000;!important;
+		}
+	</style>
+	{% block CSS %} {% end %}
+</head>
+<body>
+    <!--导航栏-->
+    <!--使用navbar-fixed-top固定到顶部-->
+    <nav class="nav navbar-default navbar-fixed-top" role="navigation">
+        <!--使用流布局-->
+        <div class="container">
+            <!--指定logo位置及图片-->
+            <div class="navbar-header">
+                <a href="/index" class="navbar-brand">{{get_title_data('title')}}</a>
+            </div>
+            <div class="collapse navbar-collapse" id="menu">
+				<!--菜单栏-->
+                <!--使用位置来指定放在那里-->
+				<ul class="nav navbar-nav navbar-left">
+					<li><a>{{get_title_data('site')}}</a></li>
+				</ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <!--超链接-->
+					<li class="time"><a></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+	<div class="container body">
+		{% raw xsrf_form_html() %}
+		<div class="row content">
+			<div class="col-md-2">
+				<div class="row left-menu">
+					<br>
+					<div class="col-md-12 list-group">
+						  <a id="index" href="/admin/index" class="list-group-item">Dashboard</a>
+						  <a id="article" href="/admin/article" class="list-group-item">文章管理</a>
+						  <a id="tag" href="/admin/tag" class="list-group-item">分类管理</a>
+						  <a id="flink" href="/admin/flink" class="list-group-item">友链管理</a>
+						  <a id="blog" href="/admin/blog" class="list-group-item">博客系统</a>
+						  <a id="profile" href="/admin/profile" class="list-group-item">个人资料</a>
+						<br>
+						  <a id="logout" href="/admin/logout" class="list-group-item">退出</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-10 body-data">
+				{% block Body %} {% end %}
+			</div>
+			<div class="row">
+				<div class="col-md-12 text-center navbar-fixed-bottom panel-footer">{{ footer_info() }}</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquery.cookie.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+	<script>
+		/* Ajax 初始化请求操作*/
+		$(function () {
+			$.ajaxSetup({
+				beforeSend: function (xhr, settings) {
+					xhr.setRequestHeader('X-CSRFtoken', $.cookie('_xsrf'));
+				}
+			});
+		});
+
+		/* 获取时间 */
+		function get_ctime() {
+			var data = new Date();
+			var ch = data.getHours();
+			var cM = data.getMinutes();
+			var ctime_m = ch + ':' + cM;
+			var ctime = ch + ' ' + cM;
+			var cm = data.getMonth() + 1;
+			var cd = data.getDate();
+			var cj = data.getDay();
+			var cdata = '周' + cj + ' ' + cm + '月' + cd + '日';
+			if($('.time>a').text().indexOf(":") > 0 ){
+				$('.time>a').text('当前时间：' + ctime + ' | ' + cdata);
+			}else{
+				$('.time>a').text('当前时间：' + ctime_m + ' | ' + cdata);
+			}
+		}
+
+		/* 定时更新时间 */
+		$(function () {
+			get_ctime();
+			setInterval('get_ctime()',1000)
+		});
+
+		document.addEventListener("visibilitychange", function () {
+			if (document.hidden) {
+				$('title').text($('title').attr('data'));
+			} else  {
+			   	$('title').text('欢迎回来ヽ(✿ﾟ▽ﾟ)ノ');
+				setTimeout("$('title').text($('title').attr('data'));",3000);
+			}
+		}, false);
+    </script>
+	{% block JS %} {% end %}
+</body>
+</html>

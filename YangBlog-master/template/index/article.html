@@ -1,0 +1,66 @@
+{% extends '../master/layout.html'%}
+{% block CSS%}
+<style>
+	.article-main {
+		background-color: white;
+		color: #000;
+	}
+    .article-body {
+        margin: 20px;
+    }
+    .post {
+        margin-bottom: 10px;
+    }
+	.post-meta {
+		color: #888;		
+	}
+	.page-button {
+		margin-bottom: 20px;
+	}
+    .p-type {
+        margin: 0;!important;
+        padding: 0;!important;
+    }
+</style>
+{% end %}
+
+{% block Body %}
+<div class="row article-main">
+    <div class="article-body">
+    <article class="post" a-id="{{article_data['id']}}">
+		<div class="post-header">
+			<i class="p-type">YangEver</i>
+			<h1 class="title">{{article_data['title']}}</h1>
+		</div>
+		<div class="post-meta">
+			{{article_data['article_type']}} | {{article_data['created_date']}} | {{article_data['read_count']}} views | 最后更新时间: {{article_data['update_date']}}
+		</div>
+		<br>
+		<div id="entry-single" class="entry">
+            {% raw article_data['content'] %}
+		</div>
+		<hr>
+		<p class="announce"><span><strong>声明:</strong></span> 除非注明，<a href="/index">Prozhi</a>文章均为原创，转载请以链接形式标明本文地址<br>本文地址: <a href="/article/{{article_data['id']}}.html">点击跳转</a></p>
+    </article>
+    </div>
+	<br>
+	<div class="page-button">
+			<div class="text-center">
+				<a class="button button-primary button-pill button-small" href="/article/{{article_data['p_a_id']}}.html" id="{{article_data['p_a_id']}}" rel="prev">上一篇</a>
+				<a class="button button-primary button-pill button-small" href="/article/{{article_data['n_a_id']}}.html" id="{{article_data['n_a_id']}}" rel="next">下一篇</a>
+			</div>
+	</div>
+</div>
+{% end %}
+
+{% block JS %}
+<script>
+	$(function () {
+		$('.page-button').find('a').each(function () {
+			if($(this).attr('id') === $('article').attr('a-id')){
+			    $(this).attr('class', 'button button-pill button-small').attr('href','javascript:void(0);').text('没有了')
+			}
+        })
+    })
+</script>
+{% end %}

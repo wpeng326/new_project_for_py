@@ -1,0 +1,51 @@
+{% extends '../master/layout.html'%}
+{% block CSS%}
+<style>
+    .article-body {
+        margin: 20px;
+    }
+    .post {
+        margin-bottom: 10px;
+    }
+    .p-type {
+        margin: 0;!important;
+        padding: 0;!important;
+    }
+    .pg-count {
+        text-align: center;
+    }
+   .pg-count .page {
+        padding: 5px;
+    }
+</style>
+{% end %}
+
+{% block Body %}
+<div class="row">
+    <div class="article-body">
+    {% for a in at_list %}
+    <article class="post" id="{{a['id']}}">
+      <div class="post-header">
+          <i class="p-type">YangEver</i>
+          <!--<span class="p-type glyphicon glyphicon-cloud" aria-hidden="true"></span>-->
+          <h3 class="title">
+              <a class="t2000" href="/article/{{a['id']}}.html" rel="bookmark">{{a['title']}}</a>
+          </h3>
+      </div>
+      <div class="excerpt">
+          <p>{{a['summary']}} ...</p>
+      </div>
+      <div class="post-meta">
+          {{a['article_type']}} | {{a['created_date']}} | {{a['read_count']}} views
+      </div>
+        <!--<a class="thumb-img" href="https://zww.me/26725.zsay" style="background-image:url(https://com.zwwooooo.com/2017/11/171124-smartisan-pro2-135x120.jpg);"></a>-->
+    </article>
+    {% end %}
+    </div>
+</div>
+<div class="row pg-count">
+    <div>
+        {% raw page_html %}
+    </div>
+</div>
+{% end %}

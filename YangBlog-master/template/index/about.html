@@ -1,0 +1,32 @@
+{% extends '../master/layout.html'%}
+{% block CSS%}
+<style>
+    .article-body {
+        margin: 20px;
+    }
+    .p-type {
+        margin: 0;!important;
+        padding: 0;!important;
+    }
+</style>
+{% end %}
+
+{% block Body %}
+<div class="row">
+    <div class="article-body">
+    <div class="about-me">
+		<div class="post-header">
+			<div class="p-type">站长： {{about_data['username']}}</div>
+		</div>
+		<div id="entry-single" class="entry">
+			<h2><a href="/about">About Me</a></h2>
+			<br>
+			<p>简介： {{about_data['about']}}</p>
+			<p>QQ： 000000</p>
+			<p>WeChat： 000000</p>
+			<p>Email： {{about_data['email']}}</p>
+		</div>
+    </div>
+    </div>
+</div>
+{% end %}

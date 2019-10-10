@@ -1,0 +1,198 @@
+{% extends './main.html'%}
+{% block CSS%}
+<style>
+    .status-label {
+        margin-top: 10px;
+        font-weight: bold;
+    }
+</style>
+{% end %}
+
+{% block Body %}
+<br>
+<div class="row">
+    <div class="col-md-12">
+        <h2>服务器状态:</h2>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                <canvas class="status-img-chart" id="cpu-chart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas class="status-img-chart" id="mem-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% end %}
+
+{% block JS %}
+<script src="/static/js/Chart.js"></script>
+<script>
+    var cpu_chart_c = $("#cpu-chart");
+    var cpu_chart = new Chart(cpu_chart_c, {
+        // The type of chart we want to create
+        type: 'line',
+        // The data for our dataset
+        data: {
+            labels: ["15:01", "15:02", "15:03", "15:04", "15:05", "15:06", "15:07", "15:08", "15:09"],
+            datasets: [{
+                label: "1分钟负载",
+                fill: false,
+                borderWidth: 1,
+                backgroundColor: 'rgb(102, 153, 255)',
+                borderColor: 'rgb(102, 153, 255)',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            },{
+                label: "5分钟负载",
+                fill: false,
+                borderWidth: 1,
+                backgroundColor: 'rgb(0, 255, 204)',
+                borderColor: 'rgb(0, 255, 204)',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            },{
+                label: "15分钟负载",
+                fill: false,
+                borderWidth: 1,
+                backgroundColor: 'rgb(0, 102, 255)',
+                borderColor: 'rgb(0, 102, 255)',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            }
+            ]
+        },
+
+        // Configuration options go here
+        options: {
+                responsive: true,
+                title:{
+                    display:true,
+                    text:'CPU 负载状态'
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: '时间'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: '负载'
+                        },
+                        ticks: {
+                            suggestedMin: 0,
+                            suggestedMax: 4
+                        }
+                    }]
+                }
+            }
+    });
+    var mem_chart_c = $("#mem-chart");
+    var mem_chart = new Chart(mem_chart_c, {
+        // The type of chart we want to create
+        type: 'line',
+        // The data for our dataset
+        data: {
+            labels: ["15:01", "15:02", "15:03", "15:04", "15:05", "15:06", "15:07", "15:08", "15:09"],
+            datasets: [{
+                label: "内存剩余量",
+                borderWidth: 1,
+                backgroundColor: 'rgb(51, 204, 102)',
+                borderColor: 'rgb(0, 204, 255)',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            }]
+        },
+
+        // Configuration options go here
+        options: {
+                responsive: true,
+                title:{
+                    display:true,
+                    text:'内存剩余状态'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: '时间'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: '容量'
+                        },
+                        ticks: {
+                            suggestedMin: 0,
+                            suggestedMax: 16
+                        }
+                    }]
+                }
+        }
+    });
+
+    function flushMemData(chart, data) {
+        chart.data.labels = data.date;
+        chart.data.datasets[0].data = data.free;
+        chart.update();
+    }
+
+    function flushCpuData(chart, data) {
+        chart.data.labels = data.date;
+        chart.data.datasets[0].data = data.load_1;
+        chart.data.datasets[1].data = data.load_5;
+        chart.data.datasets[2].data = data.load_15;
+        chart.update();
+    }
+
+    function flush_status_chart() {
+        $.ajax({
+        type:'GET',
+        url: '/admin/api/v1/status?type=cpu&count=20',
+        dataType: 'json',
+        success: function(arg){
+            console.log(arg);
+            if(arg.status !== 'false'){
+                flushCpuData(cpu_chart, arg.data)
+            }else{
+                console.log(arg.status)
+            }
+        }
+        });
+        $.ajax({
+        type:'GET',
+        url: '/admin/api/v1/status?type=mem&count=20',
+        dataType: 'json',
+        success: function(arg){
+            console.log(arg);
+            if(arg.status !== 'false'){
+                flushMemData(mem_chart, arg.data)
+            }else{
+                console.log(arg.status)
+            }
+        }
+        });
+    }
+
+    /* 定时30s更新一次 */
+    $(function () {
+        $('#index').addClass('active');
+        flush_status_chart();
+        setInterval('flush_status_chart();',30000)
+    });
+</script>
+{% end %}

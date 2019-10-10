@@ -1,0 +1,135 @@
+{% extends './main.html'%}
+{% block CSS%}
+<style>
+    #changeTagModalLabel {
+        font-weight: bold;
+    }
+    .change-tag-msg {
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
+{% end %}
+
+{% block Body %}
+<br>
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-2">
+                <button type="button" class="button button-primary button-pill button-small" data-toggle="modal" data-target="#changeTagModal" action="post" onclick="changeTagModal(this);"><i class="fa fa-plus"></i></button>
+            </div>
+        </div>
+    </div>
+    <br>
+  <div class="row">
+      <table class="table table-bordered">
+        <colgroup>
+          <col width="50">
+          <col width="100">
+          <col width="100">
+        </colgroup>
+        <thead>
+          <tr class="info">
+            <th class="text-center">ID</th>
+            <th class="text-center">名称</th>
+            <th class="text-center">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in tags_list %}
+            <tr class="text-center">
+                <td class="id">{{ t['id'] }}</td>
+                <td class="type">{{ t['type']  }}</td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="button button-highlight button-pill button-small" data-toggle="modal" data-target="#changeTagModal" action="patch" onclick="changeTagModal(this);">编辑</button>
+                    </div>
+                </td>
+            </tr>
+          {% end %}
+        </tbody>
+      </table>
+  </div>
+  </div>
+</div>
+
+<!-- changeTagsModal -->
+<div class="modal fade" id="changeTagModal" tabindex="-1" role="dialog" aria-labelledby="changeTagModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeModal();">&times;</span></button>
+        <h4 class="modal-title" id="changeTagModalLabel">新增文章类型:</h4>
+      </div>
+        <br>
+        <div class="change-tag-msg col-md-12"></div>
+        <br>
+      <div class="modal-body row">
+          <div class="col-md-12">
+              <div class="input-group">
+                  <span class="input-group-addon" id="type-addon">类型名称:</span>
+                  <input type="text" id="type" class="form-control" placeholder="类型名称" aria-describedby="type-addon">
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button-primary button-rounded button-small" data-dismiss="modal" onclick="closeModal();">关闭</button>
+        <button type="button" class="button button-primary button-rounded button-small" id="action" action="" type-id="" onclick="changeTag();">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- changeTagModal End -->
+{% end %}
+
+{% block JS %}
+
+<script>
+    $(function () {
+        $('#tag').addClass('active');
+    });
+
+    function closeModal() {
+        $('#type').val('');
+        $('#action').attr('action','')
+    }
+
+    function changeTagModal(ths) {
+        if($(ths).attr('action') === 'patch'){
+            $('#action').attr('action','patch').text('确认修改').attr('class','button button-highlight button-rounded button-small');
+            $('#action').attr('type-id',$(ths).parent().parent().parent().find('.id').text());
+            $('#type').val($(ths).parent().parent().parent().find('.type').text());
+            $('#changeTagModalLabel').text('确认修改类型：').css('color','#f0ad4e');
+        }else if($(ths).attr('action') === 'post'){
+            $('#action').attr('action','post').text('添加').attr('class','button button-action button-rounded button-small');
+            $('#action').attr('type-id','post');
+            $('#changeTagModalLabel').text('增加类型：').css('color','#1E9FFF');
+        }
+    }
+
+  function changeTag() {
+        var tag_data = {};
+        tag_data['type_id'] = $('#action').attr('type-id');
+        tag_data['type'] = $('#type').val();
+        tag_data['action'] = $('#action').attr('action');
+        console.log(tag_data);
+        $.ajax({
+            type:'POST',
+            url: '/admin/tag',
+            data: tag_data,
+            dataType: 'json',
+            success: function(arg){
+                console.log(arg);
+                if(arg.status !== 'false'){
+                    $('.change-tag-msg').text(arg.message).css("color",'#4cae4c');
+                    window.location.reload();
+                }else{
+                    $('.change-tag-msg').text(arg.message).css("color",'#d9534f');
+                }
+            }
+        });
+  }
+</script>
+{% end %}

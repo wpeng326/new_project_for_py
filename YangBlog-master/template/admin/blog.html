@@ -1,0 +1,68 @@
+{% extends './main.html'%}
+{% block CSS%}
+<style>
+</style>
+{% end %}
+
+{% block Body %}
+<br>
+<div class="row">
+    <div class="col-md-6">
+        <form class="blog-info">
+          <div class="form-group">
+            <label for="title">博客标题</label>
+            <input type="text" class="form-control" id="title" value="{{blog_info['title']}}">
+          </div>
+          <div class="form-group">
+            <label for="site">博客前缀</label>
+            <input type="text" class="form-control" id="site" value="{{blog_info['site']}}" placeholder="密码">
+          </div>
+          <div class="form-group">
+            <label for="about">关于我</label>
+              <textarea rows="8" class="form-control" id="about">{{blog_info['about']}}</textarea>
+          </div>
+           <div class="form-group">
+            <label for="copy_right">底部信息</label>
+            <textarea rows="3" class="form-control" id="copy_right">{{blog_info['copy_right']}}</textarea>
+          </div>
+          <hr>
+          <button type="button" class="button button-primary button-rounded" onclick="changeBlog();" >更新</button>
+          <span class="change-profile-msg"></span>
+        </form>
+    </div>
+</div>
+{% end %}
+
+{% block JS %}
+<script>
+    $(function () {
+        $('#blog').addClass('active');
+    });
+
+    function changeBlog() {
+          var blog_data = {};
+          $('.blog-info').find('input').each(function () {
+              blog_data[$(this).attr('id')] = $(this).val();
+          });
+          $('.blog-info').find('textarea').each(function () {
+              blog_data[$(this).attr('id')] = $(this).val();
+          });
+          console.log(blog_data);
+          $.ajax({
+              type:'POST',
+              url: '/admin/blog',
+              data: blog_data,
+              dataType: 'json',
+              success: function(arg){
+                  console.log(arg);
+                  if(arg.status !== 'false'){
+                      $('.change-profile-msg').text(arg.message).css("color",'#4cae4c');
+                      window.location.reload();
+                  }else{
+                      $('.change-profile-msg').text(arg.message).css("color",'#d9534f');
+                  }
+              }
+          });
+    }
+</script>
+{% end %}

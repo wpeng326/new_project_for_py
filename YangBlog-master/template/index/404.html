@@ -1,0 +1,36 @@
+{% extends '../master/layout.html'%}
+{% block CSS%}
+<style>
+    .article-body {
+        margin: 20px;
+        display: block;
+        width: 960px;
+        text-align: center;
+    }
+    .clear {
+        display: inline-block;
+        clear: both;
+    }
+</style>
+{% end %}
+
+{% block Body %}
+<div class="row">
+    <div class="article-body">
+        <div id="fof" class="clear">
+            <div class="hgroup clear">
+                <img src="/static/img/404.png" />
+                <h2>Error ! <span>Page Not Found</span></h2>
+            </div>
+            <p>您所请求的资源未找到...</p>
+            <p><a href="/index">« 返回主页</a></p>
+        </div>
+    </div>
+</div>
+{% end %}
+
+{% block JS %}
+<script>
+
+</script>
+{% end %}
